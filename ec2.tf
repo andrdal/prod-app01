@@ -3,15 +3,22 @@ data "aws_ssm_parameter" "linuxsample-ami" {
   name = "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2"
 }
 
+# Generate a random string for uniqueness
+resource "random_string" "suffix" {
+  length  = 4
+  special = false
+  upper   = false
+}
+
 # Create IAM Instance Profile
 resource "aws_iam_instance_profile" "linuxsample_profile" {
-  name = "linuxsamples_profile"
+  name = "linuxsamples_profile_${random_string.suffix.result}"
   role = aws_iam_role.role.name
 }
 
 #Create and bootstrap linuxsample
 resource "aws_iam_role" "role" {
-  name = "linuxsamples_role"
+  name = "linuxsamples_role_${random_string.suffix.result}"
   path = "/"
 
   assume_role_policy = <<EOF
@@ -132,3 +139,4 @@ resource "aws_security_group" "sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
